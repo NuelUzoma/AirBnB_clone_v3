@@ -14,11 +14,11 @@ from models.state import State
 from api.v1.views import app_views
 
 
-@app_views.route('/states/', methods=['GET'])
+@app_views.route("/states", methods=['GET'])
 def all_state():
     """Retrieves the list of all state objects"""
     states = storage.all(State).values()
-    list_of_states = [state.to_dict() for state in states]
+    list_of_states = list(map(lambda state: state.to_dict(), states))
     return jsonify(list_of_states)
 
 
@@ -42,16 +42,15 @@ def delete_state(state_id):
     return jsonify({}), 200
 
 
-@app_views.route('/states/', methods=['POST'])
+@app_views.route('/states', methods=['POST'], strict_slashes=False)
 def create_state():
     """Creates a state object"""
     data = request.get_json()
     if not data:
         abort(400, 'Not a JSON')
-    if 'name' not in data:
+    if 'name' not in data.keys():
         abort(400, 'Missing name')
     state = State(**data)
-    storage.new(state)
     state.save()
     return jsonify(state.to_dict()), 201
 

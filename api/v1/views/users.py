@@ -1,15 +1,9 @@
 #!/usr/bin/python3
-"""Create a new user for User Object that handles all default RESTFul API
-actions: In the file 'api/v1/views/users.py' You must use to_dict() to
-retrieve an object into a valid JSON. Update api/v1/views/__init__.py
-to import this new file It has 5 endpoints: Retrieves the list of all
-User objects: GET /api/v1/users Retrieves a User object: GET
-/api/v1/users/<user_id> Deletes a User object: DELETE
-/api/v1/users/<user_id> Creates a User: POST /api/v1/users
-Updates a User object: PUT /api/v1/users/<user_id> You must use
-storage for fetching data from the storage engine (FileStorage or
-DBStorage) - tip: put from models import storage in the file
-api/v1/views/users.py"""
+"""
+Creates a new view for User objects that handles all default
+RESTFul API actions. In the file api/v1/views/users.py,
+you must use to_dict() to retrieve an object into a valid JSON.
+"""
 
 
 from api.v1.views import app_views
@@ -18,32 +12,37 @@ from models import storage
 from models.user import User
 
 
-@app_views.route('/users/', method=['GET'])
+@app_views.route('/users', method=['GET'],
+                 strict_slashes=False)
 def get_all_users():
     """Retrieve list of all user objects"""
     users = storage.all(User).values()
-    list_users = [user.to_dict() for user in users]
+    list_users = list(map(lambda user: user.to_dict(), users))
     return jsonify(list_users)
 
 
-@app_views.route('/users/<user_id>', methods=['GET'])
+@app_views.route('/users/<user_id>', methods=['GET'],
+                 strict_slashes=False)
 def single_user(user_id):
     """Retrieve a user object"""
     users = storage.get(User, user_id)
     if users is None:
         abort(404)
-    return jsonify(users.to_dict())
+    else:
+        return jsonify(users.to_dict()), 200
 
 
-@app_views.route('/users/<user_id>', methods=['DELETE'])
+@app_views.route('/users/<user_id>', methods=['DELETE'],
+                 strict_slashes=False)
 def delete_user(user_id):
     """Delete a user object"""
     users = storage.get(User, user_id)
     if users is None:
         abort(404)
-    storage.delete(users)
-    storage.save()
-    return jsonify({}), 200
+    else:
+        storage.delete(users)
+        storage.save()
+        return jsonify({}), 200
 
 
 @app_views.route('/users/', methods=['POST'])
@@ -58,6 +57,7 @@ def create_user():
         abort(400, description='Missing password')
     user = User(**data)
     storage.new(user)
+    user.save()
     return jsonify(user.to_dict()), 201
 
 
@@ -67,11 +67,12 @@ def update_user(user_id):
     users = storage.get(User, user_id)
     if users is None:
         abort(404)
-    data = request.get_json
-    if not data:
-        abort(400, description='Not in JSON')
-    for key, value in data.items():
-        if key not in ['id', 'email', 'created_at', 'updated_at']:
-            setattr(users, key, value)
-    users.save()
-    return jsonify(users.to_dict()), 200
+    else:
+        data = request.get_json
+        if not data:
+            abort(400, description='Not in JSON')
+        for key in data.keys():
+            if key not in ['id', 'email', 'created_at', 'updated_at']:
+                setattr(users, key, data[key])
+        users.save()
+        return jsonify(users.to_dict()), 200

@@ -25,12 +25,13 @@ def all_amenities():
 def single_amenity(amenity_id):
     """Retrieve a amenity object"""
     amenities = storage.get(Amenity, amenity_id)
-    if amenities is None:
+    if not amenities:
         abort(404)
-    return jsonify(amenities.to_dict())
+    return jsonify(amenities.to_dict()), 200
 
 
-@app_views.route('/amenities/<amenity_id>', methods=['DELETE'])
+@app_views.route('/amenities/<amenity_id>', methods=['DELETE'],
+                 strict_slashes=False)
 def delete_amenity(amenity_id):
     """Delete a amenity object"""
     amenities = storage.get(Amenity, amenity_id)
@@ -41,7 +42,8 @@ def delete_amenity(amenity_id):
     return jsonify({}), 200
 
 
-@app_views.route('/amenities/', methods=['POST'])
+@app_views.route('/amenities/', methods=['POST'],
+                 strict_slashes=False)
 def create_amenity():
     """Create a amenity object"""
     data = request.get_json
@@ -51,7 +53,7 @@ def create_amenity():
         abort(400, description='Missing name')
     amenity = Amenity(**data)
     storage.new(amenity)
-    amenity.save()
+    storage.save()
     return jsonify(amenity.to_dict()), 201
 
 
@@ -67,5 +69,5 @@ def update_amenity(amenity_id):
     for key, value in data.items():
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(amenity, key, value)
-    amenity.save()
+    storage.save()
     return jsonify(amenity.to_dict()), 200
