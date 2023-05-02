@@ -15,10 +15,17 @@ threaded=True
 from flask import Flask, jsonify
 from models import storage
 from api.v1.views import app_views
-import os
+from os import getenv
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.register_blueprint(app_views)
+resources = {
+    "/*": {
+        "origins": "0.0.0.0"
+    }
+}
+CORS(app, resources=resources)
 
 
 @app.teardown_appcontext
@@ -34,6 +41,6 @@ def error_handler(error):
 
 
 if __name__ == "__main__":
-    host = os.environ.get('HBNB_API_HOST', '0.0.0.0')
-    port = os.environ.get('HBNB_API_PORT', 5000)
+    host = getenv('HBNB_API_HOST') or'0.0.0.0'
+    port = getenv('HBNB_API_PORT') or 5000
     app.run(host=host, port=port, threaded=True)
