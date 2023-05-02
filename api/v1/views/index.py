@@ -10,7 +10,7 @@ app_views that returns a JSON: "status": "OK
 from api.v1.views import app_views
 from flask import jsonify
 
-@app_views.route('/status')
+@app_views.route('/status', methods=['GET'])
 def status():
     """return a JSON format of the HTTP Response"""
     return jsonify({'status': 'OK'})

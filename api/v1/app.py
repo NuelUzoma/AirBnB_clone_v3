@@ -16,11 +16,11 @@ threaded=True
 
 from flask import Flask
 from models import storage
-from app.views import app_views
-from api.v1.views import app_views
+from api.v1 import views
+import os
 
 app = Flask(__name__)
-app.register_blueprint(app_views)
+app.register_blueprint(views.app_views, app_views, url_prefix="/api/v1")
 
 
 @app.teardown_appcontext
@@ -30,4 +30,6 @@ def teardown(exception):
 
 
 if __name__ == "__main__":
-    app.run('0.0.0.0', port=5000, threaded=True)
+    host = os.environ.get('HBNB_API_HOST', '0.0.0.0')
+    port = os.environ.get('HBNB_API_PORT', 5000)
+    app.run(host=host, port=port, threaded=True)
