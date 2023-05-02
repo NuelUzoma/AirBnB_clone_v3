@@ -12,7 +12,7 @@ threaded=True
 """
 
 
-from flask import Flask
+from flask import Flask, jsonify
 from models import storage
 from api.v1.views import app_views
 import os
@@ -25,6 +25,12 @@ app.register_blueprint(app_views)
 def teardown(exception):
     """Calling the storage.close() function"""
     storage.close()
+
+
+@app.errorhandler(404)
+def error_handler(error):
+    """Error handler to return a JSON-formatted 404 status code response"""
+    return jsonify({'error': 'Not found'}), 404
 
 
 if __name__ == "__main__":
