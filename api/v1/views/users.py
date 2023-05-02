@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 """
-Create a new user for User Onject that handles all default RESTFul API
+Create a new user for User Object that handles all default RESTFul API
 actions: In the file 'api/v1/views/users.py' You must use to_dict() to
 retrieve an object into a valid JSON. Update api/v1/views/__init__.py
 to import this new file It has 5 endpoints: Retrieves the list of all
-User objects: GET /api/v1/users
+User objects: GET /api/v1/users Retrieves a User object: GET
+/api/v1/users/<user_id> Deletes a User object: DELETE
+/api/v1/users/<user_id> Creates a User: POST /api/v1/users
+Updates a User object: PUT /api/v1/users/<user_id>
 """
 
 
