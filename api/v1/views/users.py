@@ -12,7 +12,7 @@ from models import storage
 from models.user import User
 
 
-@app_views.route('/users', method=['GET'],
+@app_views.route('/users', methods=['GET'],
                  strict_slashes=False)
 def get_all_users():
     """Retrieve list of all user objects"""

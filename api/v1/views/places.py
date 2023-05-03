@@ -21,7 +21,7 @@ def all_places(city_id):
         abort(404)
     places_all = storage.all(Place).values()
     list_places_city_id = list(map(lambda place: place.city_id == city_id,
-                           places_all))
+                                   places_all))
     list_places = list(map(lambda place: place.to_dict(),
                            list_places_city_id))
     return jsonify(list_places)
